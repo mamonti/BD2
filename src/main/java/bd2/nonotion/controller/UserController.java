@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input parameters",
                     content = @Content) })
     @PostMapping(value = "/user")
-    public UserEntity createUser(@RequestBody UserCreationRequest request) {
+    public UserEntity createUser(@RequestBody @Valid UserCreationRequest request) {
         return userService.createUser(request);
     }
 

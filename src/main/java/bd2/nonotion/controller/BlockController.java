@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class BlockController {
             @ApiResponse(responseCode = "400", description = "Invalid input parameters",
                     content = @Content) })
     @PostMapping(value = "/block")
-    public BlockEntity createBlock(@RequestBody BlockCreationRequest request) {
+    public BlockEntity createBlock(@RequestBody @Valid BlockCreationRequest request) {
         return blockService.createBlock(request);
     }
 
@@ -70,7 +71,7 @@ public class BlockController {
             @ApiResponse(responseCode = "404", description = "Block not found",
                     content = @Content) })
     @PutMapping(value = "/block")
-    public BlockEntity editBlock(@RequestBody BlockUpdateRequest request) {
+    public BlockEntity editBlock(@RequestBody @Valid BlockUpdateRequest request) {
         return blockService.editBlock(request);
     }
 }
