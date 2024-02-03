@@ -1,6 +1,7 @@
 package bd2.nonotion.model.properties;
 
 import bd2.nonotion.model.BlockProperties;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,21 +13,22 @@ import java.awt.*;
 @Setter
 public class Text extends BlockProperties {
 
+    @NotBlank(message = "text field must not be null or empty")
     private String text;
 
-    private String font;
+    private String font = "arial";
 
-    private Integer size;
+    private Integer size = 1;
 
-    private Boolean bold;
+    private Boolean bold = false;
 
-    private Boolean italicized;
+    private Boolean italicized = false;
 
-    private Boolean underlined;
+    private Boolean underlined = false;
 
-    private Boolean strikethrough;
+    private Boolean strikethrough = false;
 
-    private Color color;
+    private String color = "black";
 
-    private Color backGroundcolor;
+    private String backgroundColor = "white";
 }
