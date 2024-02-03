@@ -8,7 +8,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("blocks")
 @Getter
 @Setter
-public class TitleProperties extends BlockProperties {
-
-    private String text;
+public class Page extends BlockProperties {
 }
