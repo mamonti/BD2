@@ -23,6 +23,18 @@ public class UserController {
 
     private final UserService userService;
 
+    @Operation(summary = "Get a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User retrieved",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid input parameters",
+                    content = @Content) })
+    @GetMapping(value = "/user/{userId}")
+    public UserEntity getUser(@PathVariable String userId) {
+        return userService.getUser(userId);
+    }
+
     @Operation(summary = "Create a new user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User created",
@@ -33,6 +45,29 @@ public class UserController {
     @PostMapping(value = "/user")
     public UserEntity createUser(@RequestBody @Valid UserCreationRequest request) {
         return userService.createUser(request);
+    }
+
+    @Operation(summary = "Edit a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User Edited",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid input parameters",
+                    content = @Content) })
+    @PutMapping(value = "/user/{userId}")
+    public UserEntity updateUser(@RequestBody @Valid UserCreationRequest request,
+                                 @PathVariable String userId) {
+        return userService.updateUser(request, userId);
+    }
+
+    @Operation(summary = "Delete a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid input parameters",
+                    content = @Content) })
+    @PostMapping(value = "/user/{userId}")
+    public void deleteUser(@PathVariable String userId) {
+        userService.deleteUser(userId);
     }
 
     @Operation(summary = "Get all blocks from user")

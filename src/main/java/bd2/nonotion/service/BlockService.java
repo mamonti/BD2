@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @AllArgsConstructor
 @Service
@@ -50,12 +51,12 @@ public class BlockService {
     }
 
     public BlockEntity getBlock(String id) {
-        return blockRepository.findById(id).orElseThrow();
+        return blockRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
     }
 
     @Transactional
     public void deleteBlock(String id) {
-        BlockEntity block = blockRepository.findById(id).orElseThrow();
+        BlockEntity block = blockRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
 
         for(String child : block.getContent()) {
             deleteBlock(child);
@@ -75,6 +76,8 @@ public class BlockService {
     }
 
     public BlockEntity editBlock(BlockUpdateRequest request) {
+
+        blockRepository.findById(request.getId()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
 
         BlockEntity block = BlockEntity.builder()
                 .id(request.getId())
