@@ -65,7 +65,7 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "User deleted"),
             @ApiResponse(responseCode = "400", description = "Invalid input parameters",
                     content = @Content) })
-    @PostMapping(value = "/user/{userId}")
+    @DeleteMapping(value = "/user/{userId}")
     public void deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
     }
