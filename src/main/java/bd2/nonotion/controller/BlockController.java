@@ -57,8 +57,8 @@ public class BlockController {
                     content = @Content) })
     @DeleteMapping(value = "/block/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteBlock(@PathVariable String blockId) {
-        blockService.deleteBlock(blockId);
+    public void deleteBlock(@PathVariable String id) {
+        blockService.deleteBlock(id);
     }
 
     @Operation(summary = "Edit a block")
