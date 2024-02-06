@@ -77,16 +77,4 @@ public class BlockController {
         return blockService.editBlock(request);
     }
 
-    @Operation(summary = "Share and clone a block")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Block shared",
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BlockEntity.class)) }),
-            @ApiResponse(responseCode = "400", description = "Invalid input parameters",
-                    content = @Content) })
-    @PostMapping(value = "/block/{id}/share")
-    public BlockShareResponse shareBlock(@RequestBody @Valid BlockShareRequest request,
-                                         @PathVariable String id) {
-        return blockService.shareBlock(request, id);
-    }
 }
