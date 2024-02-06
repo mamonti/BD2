@@ -1,8 +1,12 @@
 package bd2.nonotion.service;
 
 import bd2.nonotion.model.BlockEntity;
+import bd2.nonotion.model.BlockType;
 import bd2.nonotion.model.UserEntity;
+import bd2.nonotion.model.properties.Link;
 import bd2.nonotion.model.request.BlockCreationRequest;
+import bd2.nonotion.model.request.BlockShareRequest;
+import bd2.nonotion.model.request.BlockShareResponse;
 import bd2.nonotion.model.request.BlockUpdateRequest;
 import bd2.nonotion.repository.BlockRepository;
 import bd2.nonotion.repository.UserRepository;
@@ -30,10 +34,17 @@ public class BlockService {
                 .type(request.getType())
                 .properties(request.getProperties())
                 .ownerId(request.getOwnerId())
-                .parent(request.getParent())
+                .parent(request.getParent().isEmpty() ? null : request.getParent())
                 .content(new ArrayList<>())
                 .createdAt(LocalDateTime.now())
                 .build();
+
+        switch(block.getType()) {
+            case BlockType.LINK:
+                Link properties = (Link) block.getProperties();
+                blockRepository.findById(properties.getLinkedBlockId()).orElseThrow();
+                break;
+        }
 
         block = blockRepository.save(block);
 
@@ -89,5 +100,46 @@ public class BlockService {
                 .build();
 
         return blockRepository.save(block);
+    }
+
+    @Transactional
+    public BlockShareResponse shareBlock(BlockShareRequest request, String blockId) {
+        UserEntity user = userRepository.findById(request.getUserId()).orElseThrow(() -> new NoSuchElementException("User doesn't exist"));
+
+        BlockEntity parent = blockRepository.findById(request.getParentBlockId()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
+
+        String finalBlockId = cloneBlocks(blockId, request.getParentBlockId(), user);
+
+        parent.getContent().add(finalBlockId);
+
+        blockRepository.save(parent);
+
+        return BlockShareResponse.builder().blockId(finalBlockId).build();
+    }
+
+    private String cloneBlocks(String blockId, String parentId, UserEntity user) {
+        BlockEntity newBlock = blockRepository.findById(blockId).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
+
+        List<String> originalContent = List.copyOf(newBlock.getContent());
+
+        newBlock.setId(null);
+        newBlock.setContent(new ArrayList<>());
+        newBlock.setParent(parentId);
+        newBlock.setOwnerId(user.getId());
+        newBlock = blockRepository.save(newBlock);
+        for(String originalBlockId : originalContent) {
+            newBlock.getContent().add(cloneBlocks(originalBlockId, newBlock.getId(), user));
+        }
+
+        if(!newBlock.getContent().isEmpty()) {
+            blockRepository.save(newBlock);
+        }
+
+        if(parentId.isBlank()) {
+            user.getPages().add(newBlock.getId());
+            userRepository.save(user);
+        }
+
+        return newBlock.getId();
     }
 }

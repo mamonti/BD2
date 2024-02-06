@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 public class Link extends BlockProperties {
-
     @NotBlank(message = "linkedBlock field must not be null or empty")
-    private String linkedBlock;
+    private String linkedBlockId;
 }

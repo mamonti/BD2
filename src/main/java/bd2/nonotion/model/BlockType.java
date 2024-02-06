@@ -1,0 +1,5 @@
+package bd2.nonotion.model;
+
+public enum BlockType {
+    BULLETED_LIST_ITEM, DIVIDER, LINK, NUMBERED_LIST_ITEM, PAGE, QUOTE, TABLE, TEXT, TODO_LIST_ITEM, TOGGLE_LIST_ITEM
+}

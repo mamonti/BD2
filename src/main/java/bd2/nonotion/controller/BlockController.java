@@ -2,6 +2,8 @@ package bd2.nonotion.controller;
 
 import bd2.nonotion.model.BlockEntity;
 import bd2.nonotion.model.request.BlockCreationRequest;
+import bd2.nonotion.model.request.BlockShareRequest;
+import bd2.nonotion.model.request.BlockShareResponse;
 import bd2.nonotion.model.request.BlockUpdateRequest;
 import bd2.nonotion.service.BlockService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,8 +59,8 @@ public class BlockController {
                     content = @Content) })
     @DeleteMapping(value = "/block/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteBlock(@PathVariable String id) {
-        blockService.deleteBlock(id);
+    public void deleteBlock(@PathVariable String blockId) {
+        blockService.deleteBlock(blockId);
     }
 
     @Operation(summary = "Edit a block")
@@ -73,5 +75,18 @@ public class BlockController {
     @PutMapping(value = "/block")
     public BlockEntity editBlock(@RequestBody @Valid BlockUpdateRequest request) {
         return blockService.editBlock(request);
+    }
+
+    @Operation(summary = "Share and clone a block")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Block shared",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BlockEntity.class)) }),
+            @ApiResponse(responseCode = "400", description = "Invalid input parameters",
+                    content = @Content) })
+    @PostMapping(value = "/block/{id}/share")
+    public BlockShareResponse shareBlock(@RequestBody @Valid BlockShareRequest request,
+                                         @PathVariable String id) {
+        return blockService.shareBlock(request, id);
     }
 }

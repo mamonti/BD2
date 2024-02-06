@@ -16,7 +16,7 @@ public class BlockEntity {
     @Id
     private String id;
 
-    private String type;
+    private BlockType type;
 
     private BlockProperties properties;
 
