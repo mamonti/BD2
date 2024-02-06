@@ -43,7 +43,6 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input parameters",
                     content = @Content) })
     @PostMapping(value = "/user")
-    @CrossOrigin
     public UserEntity createUser(@RequestBody @Valid UserCreationRequest request) {
         return userService.createUser(request);
     }
