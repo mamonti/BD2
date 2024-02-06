@@ -6,8 +6,6 @@ import bd2.nonotion.model.BlockType;
 import bd2.nonotion.model.UserEntity;
 import bd2.nonotion.model.properties.Link;
 import bd2.nonotion.model.request.BlockCreationRequest;
-import bd2.nonotion.model.request.BlockShareRequest;
-import bd2.nonotion.model.request.BlockShareResponse;
 import bd2.nonotion.model.request.BlockUpdateRequest;
 import bd2.nonotion.repository.BlockRepository;
 import bd2.nonotion.repository.UserRepository;
@@ -17,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @AllArgsConstructor
@@ -31,22 +28,26 @@ public class BlockService {
     @Transactional
     public BlockEntity createBlock(BlockCreationRequest request) {
 
+        if(request.getParent() == null || request.getParent().isBlank()) {
+            request.setParent(null);
+            if(!request.getType().equals(BlockType.PAGE))
+                throw new NotAPageException("only PAGE blocks can have no parent");
+        }
+
+        if(request.getParent() != null) {
+            blockRepository.findById(request.getParent()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
+        }
+
+        UserEntity user = userRepository.findById(request.getOwnerId()).orElseThrow(() -> new NoSuchElementException("User doesn't exist"));
+
         BlockEntity block = BlockEntity.builder()
                 .type(request.getType())
                 .properties(request.getProperties())
                 .ownerId(request.getOwnerId())
-                .parent(request.getParent().isBlank() ? null : request.getParent())
+                .parent(request.getParent())
                 .content(new ArrayList<>())
                 .createdAt(LocalDateTime.now())
                 .build();
-
-        if(!block.getType().equals(BlockType.PAGE) && block.getParent() == null) {
-            throw new NotAPageException("only PAGE blocks can have no parent");
-        }
-
-        if(block.getParent() != null) {
-            blockRepository.findById(block.getParent()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
-        }
 
         switch(block.getType()) {
             case BlockType.LINK:
@@ -58,7 +59,6 @@ public class BlockService {
         block = blockRepository.save(block);
 
         if(block.getParent() == null) {
-            UserEntity user = userRepository.findById(block.getOwnerId()).orElseThrow(() -> new NoSuchElementException("User doesn't exist"));
             user.getPages().add(block.getId());
             userRepository.save(user);
         } else {
@@ -97,8 +97,15 @@ public class BlockService {
 
     public BlockEntity editBlock(BlockUpdateRequest request) {
 
+        if(request.getParent() == null || request.getParent().isBlank()) {
+            request.setParent(null);
+            if(!request.getType().equals(BlockType.PAGE))
+                throw new NotAPageException("only PAGE blocks can have no parent");
+        }
+
         blockRepository.findById(request.getId()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
-        blockRepository.findById(request.getParent()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
+        if(request.getParent() != null)
+            blockRepository.findById(request.getParent()).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
         userRepository.findById(request.getOwnerId()).orElseThrow(() -> new NoSuchElementException("User doesn't exist"));
 
         BlockEntity block = BlockEntity.builder()
@@ -106,13 +113,9 @@ public class BlockService {
                 .type(request.getType())
                 .properties(request.getProperties())
                 .ownerId(request.getOwnerId())
-                .parent(request.getParent().isBlank() ? null : request.getParent())
+                .parent(request.getParent())
                 .lastEditAt(LocalDateTime.now())
                 .build();
-
-        if(!block.getType().equals(BlockType.PAGE) && block.getParent() == null) {
-            throw new NotAPageException("only PAGE blocks can have no parent");
-        }
 
         return blockRepository.save(block);
     }
