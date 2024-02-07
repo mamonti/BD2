@@ -78,8 +78,10 @@ public class BlockService {
     public void deleteBlock(String id) {
         BlockEntity block = blockRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Block doesn't exist"));
 
-        for(String child : block.getContent()) {
-            deleteBlock(child);
+        if(block.getContent() != null) {
+            for(String child : block.getContent()) {
+                deleteBlock(child);
+            }
         }
 
         if(block.getParent() == null) {

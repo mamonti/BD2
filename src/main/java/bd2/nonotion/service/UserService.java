@@ -58,8 +58,10 @@ public class UserService {
     public void deleteUser(String userId) {
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User doesn't exist"));
 
-        for(String blockId : user.getPages()) {
-            blockService.deleteBlock(blockId);
+        if(user.getPages() != null) {
+            for(String blockId : user.getPages()) {
+                blockService.deleteBlock(blockId);
+            }
         }
 
         userRepository.delete(user);
